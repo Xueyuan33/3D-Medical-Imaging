@@ -1,0 +1,51 @@
+#include <itkImage.h>
+#include <itkImageFileReader.h>
+#include <itkOtsuMultipleThresholdsImageFilter.h>
+#include <itkImageFileWriter.h>
+
+int main(int argc, char *argv[]) {
+    // Define the image types with double pixel type
+    using ImageType = itk::Image<double, 3>;
+
+    // Create an image reader
+    using ReaderType = itk::ImageFileReader<ImageType>;
+    ReaderType::Pointer reader = ReaderType::New();
+    reader->SetFileName("/home/lix73/Desktop/data/itkHWData/5.nii.gz"); // Set the path to your input MRI image
+
+    try {
+        reader->Update();
+    } catch (itk::ExceptionObject &excp) {
+        std::cerr << "Error reading the input image: " << excp << std::endl;
+        return EXIT_FAILURE;
+    }
+
+    // Create the Otsu thresholding filter with a double pixel type
+    using OtsuFilterType = itk::OtsuMultipleThresholdsImageFilter<ImageType, ImageType>;
+    OtsuFilterType::Pointer otsuFilter = OtsuFilterType::New();
+    otsuFilter->SetInput(reader->GetOutput());
+    otsuFilter->SetNumberOfThresholds(2); // For K=5 classes, use 4 thresholds
+
+    try {
+        otsuFilter->Update();
+    } catch (itk::ExceptionObject &excp) {
+        std::cerr << "Error applying Otsu thresholding: " << excp << std::endl;
+        return EXIT_FAILURE;
+    }
+
+    // Create an image writer for the OtsuLabels
+    using WriterType = itk::ImageFileWriter<ImageType>;
+    WriterType::Pointer writer = WriterType::New();
+    writer->SetFileName("/home/lix73/Desktop/data/itkHWData/OtsuLabels5.nii.gz"); // Set the path for the OtsuLabels output
+
+    // Set the input for the writer
+    writer->SetInput(otsuFilter->GetOutput());
+
+    try {
+        writer->Update();
+    } catch (itk::ExceptionObject &excp) {
+        std::cerr << "Error writing OtsuLabels: " << excp << std::endl;
+        return EXIT_FAILURE;
+    }
+
+    return EXIT_SUCCESS;
+}

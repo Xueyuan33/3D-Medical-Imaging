@@ -1,0 +1,76 @@
+#include <itkImage.h>
+#include <itkImageFileReader.h>
+#include <itkImageFileWriter.h>
+#include <itkRGBPixel.h>
+#include <itkImageRegionIterator.h>
+
+// Define the types of the images
+using LabelPixelType = unsigned char; // Adjust this type if you have more than 255 clusters
+using RGBPixelType = itk::RGBPixel<unsigned char>;
+constexpr unsigned int Dimension = 3;
+
+using LabelImageType = itk::Image<LabelPixelType, Dimension>;
+using RGBImageType = itk::Image<RGBPixelType, Dimension>;
+
+using ReaderType = itk::ImageFileReader<LabelImageType>;
+using WriterType = itk::ImageFileWriter<RGBImageType>;
+
+// Function to map labels to colors
+RGBPixelType LabelToColor(LabelPixelType label)
+{
+    switch(label)
+    {
+        case 1: return RGBPixelType(0, 0, 255); // Blue: white matter
+        case 2: return RGBPixelType(0, 255, 0); // Green: gray matter
+        case 3: return RGBPixelType(255, 0, 0); // Red: cerebrospinal fluid
+        case 4: return RGBPixelType(255, 255, 0); // Yellow: scalp
+        default: return RGBPixelType(0, 0, 0); // Black: background or other
+    }
+}
+
+int main(int argc, char * argv[])
+{
+    if(argc < 3)
+    {
+        std::cerr << "Usage: " << argv[0] << " inputLabelImage outputRGBImage" << std::endl;
+        return EXIT_FAILURE;
+    }
+
+    const char * inputLabelImageFileName = argv[1];
+    const char * outputRGBImageFileName = argv[2];
+
+    // Read the label image
+    ReaderType::Pointer reader = ReaderType::New();
+    reader->SetFileName(inputLabelImageFileName);
+    reader->Update();
+
+    // Create an image to store the RGB values
+    RGBImageType::Pointer rgbImage = RGBImageType::New();
+    rgbImage->SetRegions(reader->GetOutput()->GetLargestPossibleRegion());
+    rgbImage->Allocate();
+
+    itk::ImageRegionIterator<LabelImageType> labelIter(reader->GetOutput(), reader->GetOutput()->GetRequestedRegion());
+    itk::ImageRegionIterator<RGBImageType> rgbIter(rgbImage, rgbImage->GetRequestedRegion());
+
+    for(labelIter.GoToBegin(), rgbIter.GoToBegin(); !labelIter.IsAtEnd(); ++labelIter, ++rgbIter)
+    {
+        rgbIter.Set(LabelToColor(labelIter.Get()));
+    }
+
+    // Write the RGB image
+    WriterType::Pointer writer = WriterType::New();
+    writer->SetFileName(outputRGBImageFileName);
+    writer->SetInput(rgbImage);
+
+    try
+    {
+        writer->Update();
+    }
+    catch (itk::ExceptionObject & error)
+    {
+        std::cerr << "Error: " << error << std::endl;
+        return EXIT_FAILURE;
+    }
+
+    return EXIT_SUCCESS;
+}

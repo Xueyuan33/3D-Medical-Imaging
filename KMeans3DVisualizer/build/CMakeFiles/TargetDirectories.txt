@@ -1,0 +1,3 @@
+/home/lix73/Desktop/ITKproject/KMeans3DVisualizer/build/CMakeFiles/KMeans3DVisualizer.dir
+/home/lix73/Desktop/ITKproject/KMeans3DVisualizer/build/CMakeFiles/edit_cache.dir
+/home/lix73/Desktop/ITKproject/KMeans3DVisualizer/build/CMakeFiles/rebuild_cache.dir

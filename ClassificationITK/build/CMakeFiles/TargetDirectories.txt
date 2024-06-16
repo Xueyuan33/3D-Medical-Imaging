@@ -1,0 +1,7 @@
+/home/lix73/Desktop/ITKproject/ClassificationITK/build/CMakeFiles/ClassificationITK.dir
+/home/lix73/Desktop/ITKproject/ClassificationITK/build/CMakeFiles/edit_cache.dir
+/home/lix73/Desktop/ITKproject/ClassificationITK/build/CMakeFiles/rebuild_cache.dir
+/home/lix73/Desktop/ITKproject/ClassificationITK/build/CMakeFiles/list_install_components.dir
+/home/lix73/Desktop/ITKproject/ClassificationITK/build/CMakeFiles/install.dir
+/home/lix73/Desktop/ITKproject/ClassificationITK/build/CMakeFiles/install/local.dir
+/home/lix73/Desktop/ITKproject/ClassificationITK/build/CMakeFiles/install/strip.dir
